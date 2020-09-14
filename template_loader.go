@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+    "strings"
 )
 
 // LocalFilesystemLoader represents a local filesystem loader with basic
@@ -86,19 +87,16 @@ func (fs *LocalFilesystemLoader) Abs(base, name string) string {
 	if filepath.IsAbs(name) {
 		return name
 	}
+	
+	// covert path "@/xxx/yyy" to "./xxx/yyy" relatived baseDirectory
+	if (strings.HasPrefix(name, "@/")) {
+		name = strings.Replace(name, "@/", "./", 1)
+		return filepath.Join(fs.baseDir, name)
+	}
 
 	// Our own base dir has always priority; if there's none
 	// we use the path provided in base.
-	var err error
-	if fs.baseDir == "" {
-		if base == "" {
-			base, err = os.Getwd()
-			if err != nil {
-				panic(err)
-			}
-			return filepath.Join(base, name)
-		}
-
+	if base != "" {
 		return filepath.Join(filepath.Dir(base), name)
 	}
 
