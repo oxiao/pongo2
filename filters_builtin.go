@@ -94,6 +94,7 @@ func init() {
 
 	RegisterFilter("float", filterFloat)     // pongo-specific
 	RegisterFilter("integer", filterInteger) // pongo-specific
+	RegisterFilter("trim", filterTrim) // added
 }
 
 func filterTruncatecharsHelper(s string, newLen int) string {
@@ -924,4 +925,8 @@ func filterYesno(in *Value, param *Value) (*Value, *Error) {
 
 	// no
 	return AsValue(choices[1]), nil
+}
+
+func filterTrim(in *Value, param *Value) (out *Value, err *Error) {
+    return AsValue(strings.TrimSpace(in.String())), nil
 }
