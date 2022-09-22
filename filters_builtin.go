@@ -27,6 +27,7 @@ package pongo2
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"math/rand"
 	"net/url"
@@ -94,7 +95,8 @@ func init() {
 
 	RegisterFilter("float", filterFloat)     // pongo-specific
 	RegisterFilter("integer", filterInteger) // pongo-specific
-	RegisterFilter("trim", filterTrim) // added
+	RegisterFilter("trim", filterTrim)       // added
+	RegisterFilter("json", filterJson)       // added 20210316
 }
 
 func filterTruncatecharsHelper(s string, newLen int) string {
@@ -927,6 +929,23 @@ func filterYesno(in *Value, param *Value) (*Value, *Error) {
 	return AsValue(choices[1]), nil
 }
 
-func filterTrim(in *Value, param *Value) (out *Value, err *Error) {
-    return AsValue(strings.TrimSpace(in.String())), nil
+func filterTrim(in *Value, param *Value) (*Value, *Error) {
+	return AsValue(strings.TrimSpace(in.String())), nil
+}
+func filterJson(in *Value, param *Value) (*Value, *Error) {
+	var (
+		err error
+		bt  []byte
+	)
+	if in.IsNil() || in.val.IsNil() || in.Interface() == nil || in.val.Interface() == nil {
+		goto END
+	}
+	if bt, err = json.Marshal(in.Interface()); nil != err || in.IsNil() {
+		goto END
+	} else {
+		return AsValue(string(bt)), nil
+	}
+END:
+	return AsValue(""), nil
+
 }

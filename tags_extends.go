@@ -26,6 +26,12 @@ func tagExtendsParser(doc *Parser, start *Token, arguments *Parser) (INodeTag, *
 		// Get parent's filename
 		parentFilename := doc.template.set.resolveFilename(doc.template, filenameToken.Val)
 
+		// support variable in path. 20220920
+		parentFilename, err := doc.template.set.RenderTemplateString(parentFilename, doc.template.set.Globals)
+		if err != nil {
+			return nil, err.(*Error)
+		}
+
 		// Parse the parent
 		parentTemplate, err := doc.template.set.FromFile(parentFilename)
 		if err != nil {
