@@ -274,3 +274,9 @@ func (tpl *Template) ExecuteBlocks(context Context, blocks []string) (map[string
 
 	return result, nil
 }
+
+// 判断模板中是否含有渲染关键字，用于判断模板是否需要渲染。
+// 注意：要在FromXXX后调用才有效，如FromFile后再调用。
+func (tpl *Template) HasTokens() bool {
+	return len(tpl.tokens) > 0
+}
